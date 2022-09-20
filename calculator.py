@@ -8,19 +8,59 @@ expression = ""
 
 def press(num):
     global expression
+    global undo_count
+    undo_count = 0
     expression = expression + str(num)
-    # equation.set(expression)
+    equation.set(expression)
+
+
+def equalpress():
+    try:
+        global expression
+        global memory
+        global undo_count
+        undo_count = 0
+        total = str(eval(expression))
+        equation.set(total)
+        memory.append(expression)
+        expression = total
+
+    except:
+        equation.set('error')
+        expression = total
 
 
 def clear():
-    pass
+    global expression
+    global memory
+    global undo_count
+    global equation
+    undo_count = 0
+    memory.append(expression)
+    expression = ""
+    equation.set("")
+
+
+def backspace():
+    global expression
+    expression = expression[:-1]
+    equation.set(expression)
+
+
+def undo():
+    global expression
+    global memory
+    global undo_count
+    undo_count -= 1
+    expression = memory[undo_count]
+    equation.set(expression)
 
 
 if __name__ == "__main__":
 
     gui = Tk()
     gui.title('Simply a Calculator')
-    gui.geometry('400x650')
+    gui.geometry('400x750')
     gui.configure(bg='black')
     gui.resizable(False, False)
 
@@ -36,9 +76,12 @@ if __name__ == "__main__":
     # Creating an equation variable
     equation = StringVar()
 
-    # Entry box
+    # Memory of the calculator, for the Undo button
+    memory = []
+    undo_count = 0
+
     expression_field = Entry(gui, textvariable=equation,
-                             bg='#191818', borderwidth=0, highlightthickness=0, fg='green', font=("Times New Roman", 44),
+                             bg='#191818', borderwidth=0, highlightthickness=0, fg='light green', font=("Times New Roman", 44),
                              width=8, justify="right")
     expression_field.grid(columnspan=4, ipadx=20, padx=60, pady=100)
 
@@ -88,30 +131,40 @@ if __name__ == "__main__":
                      borderwidth=0, highlightthickness=0, command=lambda: press(9))
     button9.grid(row=7, column=2, rowspan=2, pady=15)
 
+    zero_image = PhotoImage(file='GUI\\zero.png')
+    zero = Button(gui, image=zero_image, bg='black', activebackground="black", anchor='center',
+                  borderwidth=0, highlightthickness=0, command=lambda: press(0))
+    zero.grid(row=9, column=1, rowspan=2, pady=15)
+
     plus_image = PhotoImage(file='GUI\\plus.png')
     plus = Button(gui, image=plus_image, bg='black', activebackground="black",
                   borderwidth=0, highlightthickness=0, command=lambda: press("+"))
-    plus.grid(row=3, column=3, pady=5)
+    plus.grid(row=4, column=3, pady=5)
 
     minus_image = PhotoImage(file='GUI\\minus.png')
     minus = Button(gui, image=minus_image, bg='black', activebackground="black",
                    borderwidth=0, highlightthickness=0, command=lambda: press("-"))
-    minus.grid(row=4, column=3, pady=5)
+    minus.grid(row=5, column=3, pady=5)
 
     multiply_image = PhotoImage(file='GUI\\multiply.png')
     multiply = Button(gui, image=multiply_image, bg='black', activebackground="black",
                       borderwidth=0, highlightthickness=0, command=lambda: press("*"))
-    multiply.grid(row=5, column=3, pady=5)
+    multiply.grid(row=6, column=3, pady=5)
 
     divide_image = PhotoImage(file='GUI\\divide.png')
     divide = Button(gui, image=divide_image, bg='black', activebackground="black",
                     borderwidth=0, highlightthickness=0, command=lambda: press("/"))
-    divide.grid(row=6, column=3, pady=5)
+    divide.grid(row=3, column=3, pady=5)
 
     equal_image = PhotoImage(file='GUI\\equals.png')
     equal = Button(gui, image=equal_image, bg='black', activebackground="black",
-                   borderwidth=0, highlightthickness=0, command=lambda: press("="), anchor='center', justify='center')
-    equal.grid(row=2, column=3, pady=5)
+                   borderwidth=0, highlightthickness=0, command=lambda: equalpress(), anchor='center', justify='center')
+    equal.grid(row=9, column=2, pady=5, columnspan=2)
+
+    backspace_image = PhotoImage(file='GUI\\backspace.png')
+    backspace = Button(gui, image=backspace_image, bg='black', activebackground="black",
+                       borderwidth=0, highlightthickness=0, command=backspace)
+    backspace.grid(row=2, column=3, pady=5)
 
     clear_image = PhotoImage(file='GUI\\C.png')
     clear = Button(gui, image=clear_image, bg='black', activebackground="black",
@@ -120,7 +173,7 @@ if __name__ == "__main__":
 
     undo_image = PhotoImage(file='GUI\\undo.png')
     undo = Button(gui, image=undo_image, bg='black', activebackground="black",
-                  borderwidth=0, highlightthickness=0, command=lambda: press("="))
+                  borderwidth=0, highlightthickness=0, command=undo)
     undo.grid(row=2, column=0, columnspan=2)
 
     # Execute tkinter
